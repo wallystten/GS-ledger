@@ -23,10 +23,10 @@ jobs:
 
       - name: Grant execute permission
         run: chmod +x gradlew || true
-
+        
       - name: Build Debug APK
-        run: gradle assembleDebug
-
+        run: gradle :app:assembleDebug
+       
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
