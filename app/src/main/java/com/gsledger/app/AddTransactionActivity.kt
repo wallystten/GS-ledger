@@ -10,3 +10,4 @@ class AddTransactionActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_transaction)
     }
 }
+  
