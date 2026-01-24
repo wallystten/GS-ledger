@@ -9,6 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
+        <!-- TELA PRINCIPAL -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -17,6 +18,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- NOVA TELA: ADICIONAR LANÇAMENTO -->
+        <activity
+            android:name=".AddTransactionActivity"
+            android:exported="false" />
 
     </application>
 
