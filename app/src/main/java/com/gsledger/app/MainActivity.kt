@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Resumo financeiro (em breve)", Toast.LENGTH_SHORT).show()
         }
 
+        // 🔥 AGORA O BOTÃO VAI ABRIR A CÂMERA
         btnEscanearQR.setOnClickListener {
             startActivity(Intent(this, QrScannerActivity::class.java))
         }
