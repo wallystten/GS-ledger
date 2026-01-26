@@ -25,9 +25,13 @@
             android:name=".AddTransactionActivity"
             android:exported="false" />
 
-        <!-- Tela do leitor de QR (vamos criar em seguida) -->
         <activity
             android:name=".QrScannerActivity"
+            android:exported="false" />
+
+        <!-- 📊 Tela de Resumo Financeiro -->
+        <activity
+            android:name=".ResumoActivity"
             android:exported="false" />
 
     </application>
