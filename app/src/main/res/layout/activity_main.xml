@@ -43,4 +43,14 @@
         android:backgroundTint="#4CAF50"
         android:textColor="@android:color/white"/>
 
+    <Button
+    android:id="@+id/btnEscanearQR"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Escanear QR Code"
+    android:layout_marginTop="12dp"
+    android:backgroundTint="#FF9800"
+    android:textColor="@android:color/white"/>
+
+    
 </LinearLayout>
