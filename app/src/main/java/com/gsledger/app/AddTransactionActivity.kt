@@ -16,10 +16,8 @@ class AddTransactionActivity : AppCompatActivity() {
         val etValor = findViewById<EditText>(R.id.etValor)
         val btnSalvar = findViewById<Button>(R.id.btnSalvarLancamento)
 
-        // 🔽 RECEBE VALOR VINDO DO QR CODE
         val qrValue = intent.getStringExtra("qrValue")
         if (!qrValue.isNullOrEmpty()) {
-            // Mantém só números e separadores
             val valorLimpo = qrValue.filter { it.isDigit() || it == '.' || it == ',' }
             etValor.setText(valorLimpo)
         }
@@ -31,7 +29,8 @@ class AddTransactionActivity : AppCompatActivity() {
             if (descricao.isEmpty() || valor.isEmpty()) {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Lançamento salvo (ainda não gravado no app)", Toast.LENGTH_SHORT).show()
+                Storage.saveTransaction(this, descricao, valor)
+                Toast.makeText(this, "Lançamento salvo com sucesso!", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
