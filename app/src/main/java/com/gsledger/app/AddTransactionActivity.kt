@@ -16,6 +16,14 @@ class AddTransactionActivity : AppCompatActivity() {
         val etValor = findViewById<EditText>(R.id.etValor)
         val btnSalvar = findViewById<Button>(R.id.btnSalvarLancamento)
 
+        // 🔽 RECEBE VALOR VINDO DO QR CODE
+        val qrValue = intent.getStringExtra("qrValue")
+        if (!qrValue.isNullOrEmpty()) {
+            // Mantém só números e separadores
+            val valorLimpo = qrValue.filter { it.isDigit() || it == '.' || it == ',' }
+            etValor.setText(valorLimpo)
+        }
+
         btnSalvar.setOnClickListener {
             val descricao = etDescricao.text.toString()
             val valor = etValor.text.toString()
