@@ -74,9 +74,11 @@ class QrScannerActivity : AppCompatActivity() {
                 for (barcode in barcodes) {
                     val rawValue = barcode.rawValue ?: continue
 
+                    val valorPix = extrairValorPix(rawValue)
+
                     runOnUiThread {
                         val intent = Intent(this, AddTransactionActivity::class.java)
-                        intent.putExtra("qrValue", rawValue)
+                        intent.putExtra("qrValue", valorPix ?: "")
                         startActivity(intent)
                         finish()
                     }
@@ -86,5 +88,19 @@ class QrScannerActivity : AppCompatActivity() {
             .addOnCompleteListener {
                 imageProxy.close()
             }
+    }
+
+    // 🔍 Extrai valor do padrão PIX (campo 54)
+    private fun extrairValorPix(codigo: String): String? {
+        return try {
+            val index = codigo.indexOf("54")
+            if (index == -1) return null
+
+            val tamanho = codigo.substring(index + 2, index + 4).toInt()
+            val valor = codigo.substring(index + 4, index + 4 + tamanho)
+            valor
+        } catch (e: Exception) {
+            null
+        }
     }
 }
