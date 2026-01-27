@@ -9,10 +9,20 @@
         android:id="@+id/tvTotal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Total: R$ 0.00"
-        android:textSize="20sp"
+        android:text="Entradas: R$ 0.00\nSaídas: R$ 0.00\nSaldo: R$ 0.00"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="12dp"/>
+
+    <!-- 💡 Dicas financeiras automáticas -->
+    <TextView
+        android:id="@+id/tvDicas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dicas financeiras aparecerão aqui"
+        android:textSize="14sp"
+        android:textColor="#444"
+        android:layout_marginBottom="12dp"/>
 
     <ListView
         android:id="@+id/listViewTransacoes"
