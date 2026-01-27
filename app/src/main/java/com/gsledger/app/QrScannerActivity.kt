@@ -90,15 +90,25 @@ class QrScannerActivity : AppCompatActivity() {
             }
     }
 
-    // 🔍 Extrai valor do padrão PIX (campo 54)
+    /**
+     * 🔍 Extrai valor do QR Pix padrão EMV
+     * Campo 54 = valor da transação
+     */
     private fun extrairValorPix(codigo: String): String? {
         return try {
-            val index = codigo.indexOf("54")
-            if (index == -1) return null
+            var i = 0
+            while (i < codigo.length - 4) {
+                val id = codigo.substring(i, i + 2)
+                val tamanho = codigo.substring(i + 2, i + 4).toIntOrNull() ?: return null
+                val valor = codigo.substring(i + 4, i + 4 + tamanho)
 
-            val tamanho = codigo.substring(index + 2, index + 4).toInt()
-            val valor = codigo.substring(index + 4, index + 4 + tamanho)
-            valor
+                if (id == "54") {
+                    return valor.replace(".", ",")
+                }
+
+                i += 4 + tamanho
+            }
+            null // QR sem valor fixo (cobrança aberta)
         } catch (e: Exception) {
             null
         }
