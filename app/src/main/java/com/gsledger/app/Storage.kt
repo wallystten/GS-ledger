@@ -35,3 +35,4 @@ object Storage {
         return JSONArray(prefs.getString(KEY_TRANSACTIONS, "[]"))
     }
 }
+  
