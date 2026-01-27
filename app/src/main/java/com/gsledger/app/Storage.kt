@@ -34,5 +34,18 @@ object Storage {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         return JSONArray(prefs.getString(KEY_TRANSACTIONS, "[]"))
     }
+
+    fun deleteTransaction(context: Context, index: Int) {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        val jsonArray = JSONArray(prefs.getString(KEY_TRANSACTIONS, "[]"))
+
+        val newArray = JSONArray()
+        for (i in 0 until jsonArray.length()) {
+            if (i != index) {
+                newArray.put(jsonArray.getJSONObject(i))
+            }
+        }
+
+        prefs.edit().putString(KEY_TRANSACTIONS, newArray.toString()).apply()
+    }
 }
-  
