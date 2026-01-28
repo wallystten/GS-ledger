@@ -34,41 +34,41 @@ class NotificationListener : NotificationListenerService() {
     }
 
     private fun detectarTipo(texto: String): String {
-    val t = texto.lowercase()
+        val t = texto.lowercase()
 
-    // 🟢 ENTRADAS (dinheiro entrando)
-    val palavrasEntrada = listOf(
-        "recebeu um pix",
-        "pix recebido",
-        "valor creditado",
-        "creditado em sua conta",
-        "transferência recebida",
-        "ted recebida",
-        "depósito recebido",
-        "deposito recebido",
-        "você recebeu"
-    )
+        // 🟢 ENTRADAS (dinheiro entrando)
+        val palavrasEntrada = listOf(
+            "recebeu um pix",
+            "pix recebido",
+            "valor creditado",
+            "creditado em sua conta",
+            "transferência recebida",
+            "ted recebida",
+            "depósito recebido",
+            "deposito recebido",
+            "você recebeu"
+        )
 
-    // 🔴 SAÍDAS (dinheiro saindo)
-    val palavrasSaida = listOf(
-        "pix enviado",
-        "você enviou",
-        "pagamento realizado",
-        "compra no valor",
-        "débito realizado",
-        "debito realizado",
-        "transferência enviada",
-        "ted enviada",
-        "pagamento de"
-    )
+        // 🔴 SAÍDAS (dinheiro saindo)
+        val palavrasSaida = listOf(
+            "pix enviado",
+            "você enviou",
+            "pagamento realizado",
+            "compra no valor",
+            "débito realizado",
+            "debito realizado",
+            "transferência enviada",
+            "ted enviada",
+            "pagamento de"
+        )
 
-    if (palavrasEntrada.any { t.contains(it) }) return "entrada"
-    if (palavrasSaida.any { t.contains(it) }) return "saida"
+        if (palavrasEntrada.any { t.contains(it) }) return "entrada"
+        if (palavrasSaida.any { t.contains(it) }) return "saida"
 
-    // 🔍 Regra extra de segurança:
-    // Se tiver a palavra PIX mas não disser enviado/pagamento, assumimos entrada
-    if (t.contains("pix") && !t.contains("enviado") && !t.contains("pagamento"))
-        return "entrada"
+        // 🔍 Regra extra de segurança:
+        if (t.contains("pix") && !t.contains("enviado") && !t.contains("pagamento"))
+            return "entrada"
 
-    return "saida"
+        return "saida"
     }
+}
