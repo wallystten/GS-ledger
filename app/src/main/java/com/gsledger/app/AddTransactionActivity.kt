@@ -19,10 +19,11 @@ class AddTransactionActivity : AppCompatActivity() {
         val rbSaida = findViewById<RadioButton>(R.id.rbSaida)
         val btnSalvar = findViewById<Button>(R.id.btnSalvarLancamento)
 
-        // 📥 DADOS VINDOS DO QR
+        // 📥 DADOS VINDOS DO QR OU NOTIFICAÇÃO
         val qrValue = intent.getStringExtra("qrValue")
         val tipoAuto = intent.getStringExtra("tipoAuto")
         val descricaoAuto = intent.getStringExtra("descricaoAuto")
+        val origemAuto = intent.getStringExtra("origemAuto") // 🆕 NOVO
 
         // 💰 Preenche valor automaticamente
         if (!qrValue.isNullOrEmpty()) {
@@ -30,7 +31,7 @@ class AddTransactionActivity : AppCompatActivity() {
             etValor.setText(valorLimpo)
         }
 
-        // 📝 Preenche descrição automática (ex: NFC-e)
+        // 📝 Preenche descrição automática
         if (!descricaoAuto.isNullOrEmpty()) {
             etDescricao.setText(descricaoAuto)
         }
@@ -41,7 +42,7 @@ class AddTransactionActivity : AppCompatActivity() {
             "saida" -> rbSaida.isChecked = true
         }
 
-        // 🛡️ Segurança: se nada foi marcado, assume SAÍDA (padrão mais seguro)
+        // 🛡️ Segurança: se nada foi marcado, assume SAÍDA
         if (!rbEntrada.isChecked && !rbSaida.isChecked) {
             rbSaida.isChecked = true
         }
@@ -59,7 +60,13 @@ class AddTransactionActivity : AppCompatActivity() {
             if (descricao.isEmpty() || valor.isEmpty()) {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
             } else {
-                Storage.saveTransaction(this, descricao, valor, tipo)
+                Storage.saveTransaction(
+                    context = this,
+                    descricao = descricao,
+                    valor = valor,
+                    tipo = tipo,
+                    origem = origemAuto ?: "Manual" // 🆕 SALVANDO ORIGEM
+                )
                 Toast.makeText(this, "Lançamento salvo!", Toast.LENGTH_SHORT).show()
                 finish()
             }
