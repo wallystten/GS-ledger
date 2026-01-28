@@ -33,42 +33,45 @@ class NotificationListener : NotificationListenerService() {
         return if (matcher.find()) matcher.group(1) else null
     }
 
-    private fun detectarTipo(texto: String): String {
-        val t = texto.lowercase()
+    
+     private fun detectarTipo(texto: String): String {
+    val t = texto.lowercase()
 
-        // 🟢 ENTRADAS (dinheiro entrando)
-        val palavrasEntrada = listOf(
-            "recebeu um pix",
-            "pix recebido",
-            "valor creditado",
-            "creditado em sua conta",
-            "transferência recebida",
-            "ted recebida",
-            "depósito recebido",
-            "deposito recebido",
-            "você recebeu"
-        )
+    // 🔴 SAÍDAS (dinheiro saindo) — VERIFICAMOS PRIMEIRO
+    val palavrasSaida = listOf(
+        "pix enviado",
+        "você enviou",
+        "pagamento realizado",
+        "pagamento de",
+        "compra no valor",
+        "débito realizado",
+        "debito realizado",
+        "transferência enviada",
+        "ted enviada",
+        "você pagou",
+        "pagou um pix",
+        "pix pago"
+    )
 
-        // 🔴 SAÍDAS (dinheiro saindo)
-        val palavrasSaida = listOf(
-            "pix enviado",
-            "você enviou",
-            "pagamento realizado",
-            "compra no valor",
-            "débito realizado",
-            "debito realizado",
-            "transferência enviada",
-            "ted enviada",
-            "pagamento de"
-        )
+    // 🟢 ENTRADAS (dinheiro entrando)
+    val palavrasEntrada = listOf(
+        "recebeu um pix",
+        "pix recebido",
+        "valor creditado",
+        "creditado em sua conta",
+        "transferência recebida",
+        "ted recebida",
+        "depósito recebido",
+        "deposito recebido",
+        "você recebeu"
+    )
 
-        if (palavrasEntrada.any { t.contains(it) }) return "entrada"
-        if (palavrasSaida.any { t.contains(it) }) return "saida"
+    if (palavrasSaida.any { t.contains(it) }) return "saida"
+    if (palavrasEntrada.any { t.contains(it) }) return "entrada"
 
-        // 🔍 Regra extra de segurança:
-        if (t.contains("pix") && !t.contains("enviado") && !t.contains("pagamento"))
-            return "entrada"
+    // Regra extra: se mencionar PIX mas NÃO disser que pagou/enviou
+    if (t.contains("pix")) return "entrada"
 
-        return "saida"
-    }
+    return "saida"
+  }
 }
