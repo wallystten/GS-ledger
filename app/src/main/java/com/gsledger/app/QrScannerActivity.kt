@@ -74,13 +74,8 @@ class QrScannerActivity : AppCompatActivity() {
                 for (barcode in barcodes) {
                     val rawValue = barcode.rawValue ?: continue
 
-                    val valorPix = extrairValorPix(rawValue)
-
                     runOnUiThread {
-                        val intent = Intent(this, AddTransactionActivity::class.java)
-                        intent.putExtra("qrValue", valorPix ?: "")
-                        startActivity(intent)
-                        finish()
+                        abrirTelaLancamento(rawValue)
                     }
                     break
                 }
@@ -88,6 +83,30 @@ class QrScannerActivity : AppCompatActivity() {
             .addOnCompleteListener {
                 imageProxy.close()
             }
+    }
+
+    private fun abrirTelaLancamento(codigoQr: String) {
+        val intent = Intent(this, AddTransactionActivity::class.java)
+
+        // 🔵 É um QR PIX?
+        val valorPix = extrairValorPix(codigoQr)
+        if (valorPix != null) {
+            intent.putExtra("qrValue", valorPix)
+            intent.putExtra("tipoAuto", "entrada") // PIX geralmente recebimento
+        }
+        // 🧾 É QR de NOTA FISCAL (NFC-e)?
+        else if (codigoQr.contains("nfce") || codigoQr.contains("fazenda") || codigoQr.contains("nfe")) {
+            intent.putExtra("qrValue", "")
+            intent.putExtra("descricaoAuto", "Compra via NFC-e")
+            intent.putExtra("tipoAuto", "saida") // COMPRA = SAÍDA
+        }
+        // ❓ Outro QR qualquer
+        else {
+            intent.putExtra("qrValue", "")
+        }
+
+        startActivity(intent)
+        finish()
     }
 
     /**
@@ -108,7 +127,7 @@ class QrScannerActivity : AppCompatActivity() {
 
                 i += 4 + tamanho
             }
-            null // QR sem valor fixo (cobrança aberta)
+            null // QR sem valor fixo
         } catch (e: Exception) {
             null
         }
