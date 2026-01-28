@@ -13,7 +13,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
-import kotlinx.coroutines.*
 import java.net.URL
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -75,10 +74,7 @@ class QrScannerActivity : AppCompatActivity() {
             .addOnSuccessListener { barcodes ->
                 for (barcode in barcodes) {
                     val rawValue = barcode.rawValue ?: continue
-
-                    runOnUiThread {
-                        tratarQrLido(rawValue)
-                    }
+                    tratarCodigoQr(rawValue)
                     break
                 }
             }
@@ -87,21 +83,27 @@ class QrScannerActivity : AppCompatActivity() {
             }
     }
 
-    private fun tratarQrLido(codigoQr: String) {
+    private fun tratarCodigoQr(codigoQr: String) {
 
-        // 🔵 PIX
+        // 🔵 QR PIX
         val valorPix = extrairValorPix(codigoQr)
         if (valorPix != null) {
-            abrirTelaLancamento(valorPix, "entrada", "PIX recebido")
+            abrirTelaLancamento(valorPix, "entrada", "Pix recebido")
             return
         }
 
-        // 🧾 NFC-e (nota fiscal)
-        if (codigoQr.contains("nfce") || codigoQr.contains("fazenda")) {
-            buscarValorNfce(codigoQr)
+        // 🧾 QR NFC-e (link SEFAZ)
+        if (codigoQr.contains("fazenda.sp.gov.br")) {
+            Thread {
+                val valorNota = buscarValorNfce(codigoQr)
+                runOnUiThread {
+                    abrirTelaLancamento(valorNota ?: "", "saida", "Compra via NFC-e")
+                }
+            }.start()
             return
         }
 
+        // Outro QR
         abrirTelaLancamento("", "saida", "")
     }
 
@@ -114,9 +116,7 @@ class QrScannerActivity : AppCompatActivity() {
         finish()
     }
 
-    /**
-     * 🔍 Extrai valor do QR Pix
-     */
+    // 🔍 Extrai valor do QR Pix
     private fun extrairValorPix(codigo: String): String? {
         return try {
             var i = 0
@@ -137,26 +137,17 @@ class QrScannerActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * 🌐 Busca o valor total da NFC-e direto no site da SEFAZ
-     */
-    private fun buscarValorNfce(urlNota: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val html = URL(urlNota).readText()
+    // 🌐 Busca valor total da NFC-e no site da SEFAZ SP
+    private fun buscarValorNfce(urlNota: String): String? {
+        return try {
+            val html = URL(urlNota).readText()
 
-                val regex = Regex("Valor Total.*?R\\$\\s?([0-9,.]+)")
-                val match = regex.find(html)
-                val valor = match?.groupValues?.get(1)?.replace(".", ",") ?: ""
+            val regex = Regex("""Valor Total.*?R\$\s?([0-9\.,]+)""", RegexOption.IGNORE_CASE)
+            val match = regex.find(html)
 
-                withContext(Dispatchers.Main) {
-                    abrirTelaLancamento(valor, "saida", "Compra via NFC-e")
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    abrirTelaLancamento("", "saida", "Compra via NFC-e")
-                }
-            }
+            match?.groupValues?.get(1)
+        } catch (e: Exception) {
+            null
         }
     }
 }
