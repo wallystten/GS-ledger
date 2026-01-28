@@ -88,35 +88,46 @@ class QrScannerActivity : AppCompatActivity() {
         // 🔵 QR PIX
         val valorPix = extrairValorPix(codigoQr)
         if (valorPix != null) {
-            abrirTelaLancamento(valorPix, "entrada", "Pix recebido")
+            abrirTelaLancamento(
+                valor = valorPix,
+                tipo = "entrada",
+                descricao = "Pix recebido",
+                origem = "PIX QR"
+            )
             return
         }
 
-        // 🧾 QR NFC-e (link SEFAZ)
+        // 🧾 QR NFC-e (link SEFAZ SP)
         if (codigoQr.contains("fazenda.sp.gov.br")) {
             Thread {
                 val valorNota = buscarValorNfce(codigoQr)
                 runOnUiThread {
-                    abrirTelaLancamento(valorNota ?: "", "saida", "Compra via NFC-e")
+                    abrirTelaLancamento(
+                        valor = valorNota ?: "",
+                        tipo = "saida",
+                        descricao = "Compra via NFC-e",
+                        origem = "NFC-e"
+                    )
                 }
             }.start()
             return
         }
 
-        // Outro QR
-        abrirTelaLancamento("", "saida", "")
+        // ❓ Outro QR
+        abrirTelaLancamento("", "saida", "", "QR Code")
     }
 
-    private fun abrirTelaLancamento(valor: String, tipo: String, descricao: String) {
+    private fun abrirTelaLancamento(valor: String, tipo: String, descricao: String, origem: String) {
         val intent = Intent(this, AddTransactionActivity::class.java)
         intent.putExtra("qrValue", valor)
         intent.putExtra("tipoAuto", tipo)
         intent.putExtra("descricaoAuto", descricao)
+        intent.putExtra("origemAuto", origem) // 🆕 NOVO
         startActivity(intent)
         finish()
     }
 
-    // 🔍 Extrai valor do QR Pix
+    // 🔍 Extrai valor do QR Pix padrão EMV
     private fun extrairValorPix(codigo: String): String? {
         return try {
             var i = 0
