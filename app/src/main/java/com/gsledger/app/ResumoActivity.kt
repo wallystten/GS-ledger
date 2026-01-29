@@ -50,14 +50,15 @@ class ResumoActivity : AppCompatActivity() {
     private fun carregarLista() {
         transacoes = Storage.getTransactions(this)
 
+        val adapter = TransactionAdapter(this, transacoes)
+        listView.adapter = adapter
+
         var totalEntradas = 0.0
         var totalSaidas = 0.0
 
-        val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
-
         for (i in 0 until transacoes.length()) {
             val item = transacoes.getJSONObject(i)
-            val valor = item.optString("valor", "0").replace(".", "").replace(",", ".").toDoubleOrNull() ?: 0.0
+            val valor = parseValorBR(item.optString("valor", "0"))
             val tipo = item.optString("tipo", "saida")
 
             if (tipo == "entrada") totalEntradas += valor
@@ -66,18 +67,25 @@ class ResumoActivity : AppCompatActivity() {
 
         val saldo = totalEntradas - totalSaidas
 
-        tvTotal.text = "Entradas: ${formatador.format(totalEntradas)}\n" +
-                "Saídas: ${formatador.format(totalSaidas)}\n" +
-                "Saldo: ${formatador.format(saldo)}"
+        val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+
+        tvTotal.text =
+            "Entradas: ${formatador.format(totalEntradas)}\n" +
+            "Saídas: ${formatador.format(totalSaidas)}\n" +
+            "Saldo: ${formatador.format(saldo)}"
 
         val dicas = FinancialAdvisor.gerarDicas(transacoes)
         tvDicas.text = dicas.joinToString("\n\n")
 
         mostrarGrafico(totalEntradas, totalSaidas)
+    }
 
-        // 🔥 AQUI ESTÁ A MÁGICA
-        val adapter = TransactionAdapter(this, transacoes)
-        listView.adapter = adapter
+    // 🔥 FUNÇÃO NOVA — converte valor brasileiro corretamente
+    private fun parseValorBR(valorStr: String): Double {
+        return valorStr
+            .replace(".", "")   // remove separador de milhar
+            .replace(",", ".")  // troca vírgula decimal
+            .toDoubleOrNull() ?: 0.0
     }
 
     private fun mostrarGrafico(entradas: Double, saidas: Double) {
