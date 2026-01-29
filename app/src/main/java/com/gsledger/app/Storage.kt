@@ -11,13 +11,23 @@ object Storage {
     private const val PREF_NAME = "GS_LEDGER_PREFS"
     private const val KEY_TRANSACTIONS = "transactions"
 
-    // 🔥 AGORA COM ORIGEM (mas compatível com versões antigas)
+    // 🔹 MÉTODO ANTIGO (continua funcionando)
+    fun saveTransaction(
+        context: Context,
+        descricao: String,
+        valor: String,
+        tipo: String
+    ) {
+        saveTransaction(context, descricao, valor, tipo, "Manual")
+    }
+
+    // 🔹 MÉTODO NOVO (com origem)
     fun saveTransaction(
         context: Context,
         descricao: String,
         valor: String,
         tipo: String,
-        origem: String = "Manual"
+        origem: String
     ) {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val jsonArray = JSONArray(prefs.getString(KEY_TRANSACTIONS, "[]"))
@@ -30,7 +40,7 @@ object Storage {
             put("valor", valor)
             put("data", dataAtual)
             put("tipo", tipo)
-            put("origem", origem) // 🆕 NOVO CAMPO
+            put("origem", origem)
         }
 
         jsonArray.put(transaction)
@@ -48,9 +58,7 @@ object Storage {
 
         val newArray = JSONArray()
         for (i in 0 until jsonArray.length()) {
-            if (i != index) {
-                newArray.put(jsonArray.getJSONObject(i))
-            }
+            if (i != index) newArray.put(jsonArray.getJSONObject(i))
         }
 
         prefs.edit().putString(KEY_TRANSACTIONS, newArray.toString()).apply()
