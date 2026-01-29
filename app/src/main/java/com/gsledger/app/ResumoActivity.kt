@@ -58,7 +58,7 @@ class ResumoActivity : AppCompatActivity() {
 
         for (i in 0 until transacoes.length()) {
             val item = transacoes.getJSONObject(i)
-            val valor = parseValorBR(item.optString("valor", "0"))
+            val valor = parseValorSeguro(item.optString("valor", "0"))
             val tipo = item.optString("tipo", "saida")
 
             if (tipo == "entrada") totalEntradas += valor
@@ -66,7 +66,6 @@ class ResumoActivity : AppCompatActivity() {
         }
 
         val saldo = totalEntradas - totalSaidas
-
         val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
 
         tvTotal.text =
@@ -80,12 +79,35 @@ class ResumoActivity : AppCompatActivity() {
         mostrarGrafico(totalEntradas, totalSaidas)
     }
 
-    // 🔥 FUNÇÃO NOVA — converte valor brasileiro corretamente
-    private fun parseValorBR(valorStr: String): Double {
-        return valorStr
-            .replace(".", "")   // remove separador de milhar
-            .replace(",", ".")  // troca vírgula decimal
-            .toDoubleOrNull() ?: 0.0
+    /**
+     * 🔥 CONVERSÃO INTELIGENTE DE VALORES
+     * Aceita:
+     * 100,50
+     * 100.50
+     * 1.234,56
+     * 1234.56
+     */
+    private fun parseValorSeguro(valorStr: String): Double {
+        val valor = valorStr.trim()
+
+        return try {
+            when {
+                valor.contains(",") && valor.contains(".") -> {
+                    // Formato brasileiro 1.234,56
+                    valor.replace(".", "").replace(",", ".").toDouble()
+                }
+                valor.contains(",") -> {
+                    // Formato 100,50
+                    valor.replace(",", ".").toDouble()
+                }
+                else -> {
+                    // Formato 100.50 ou 100
+                    valor.toDouble()
+                }
+            }
+        } catch (e: Exception) {
+            0.0
+        }
     }
 
     private fun mostrarGrafico(entradas: Double, saidas: Double) {
