@@ -17,10 +17,14 @@ class TransactionAdapter(
 ) : BaseAdapter() {
 
     override fun getCount(): Int = transacoes.length()
-    override fun getItem(position: Int): Any = transacoes.getJSONObject(position)
+
+    override fun getItem(position: Int): Any =
+        transacoes.getJSONObject(position)
+
     override fun getItemId(position: Int): Long = position.toLong()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+
         val view = convertView ?: LayoutInflater.from(context)
             .inflate(R.layout.item_transacao, parent, false)
 
@@ -31,25 +35,12 @@ class TransactionAdapter(
         val tipo = item.optString("tipo", "saida")
         val origem = item.optString("origem", "Manual")
 
-        // 🔥 CORREÇÃO DEFINITIVA DO VALOR
-        val valorString = item.optString("valor", "0")
-
-        val valor = try {
-            if (valorString.contains(",")) {
-                // Formato brasileiro: 1.234,56
-                valorString.replace(".", "").replace(",", ".").toDouble()
-            } else {
-                // Já está em formato padrão
-                valorString.toDouble()
-            }
-        } catch (e: Exception) {
-            0.0
-        }
-
         val tvTitulo = view.findViewById<TextView>(R.id.tvTitulo)
         val tvOrigem = view.findViewById<TextView>(R.id.tvOrigem)
         val tvData = view.findViewById<TextView>(R.id.tvData)
         val tvValor = view.findViewById<TextView>(R.id.tvValor)
+
+        val valor = converterValorSeguro(item.optString("valor", "0"))
 
         val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
 
@@ -65,5 +56,36 @@ class TransactionAdapter(
         }
 
         return view
+    }
+
+    /**
+     * 🔒 Converte valor com segurança total
+     * Aceita:
+     *  "1100"
+     *  "1100.50"
+     *  "1.100,50"
+     *  "1100,50"
+     */
+    private fun converterValorSeguro(valorString: String): Double {
+        return try {
+            val limpo = valorString.trim()
+
+            when {
+                limpo.contains(",") && limpo.contains(".") -> {
+                    // Formato BR com milhar: 1.234,56
+                    limpo.replace(".", "").replace(",", ".").toDouble()
+                }
+                limpo.contains(",") -> {
+                    // Formato BR simples: 1234,56
+                    limpo.replace(",", ".").toDouble()
+                }
+                else -> {
+                    // Já padrão: 1234.56
+                    limpo.toDouble()
+                }
+            }
+        } catch (e: Exception) {
+            0.0
+        }
     }
 }
