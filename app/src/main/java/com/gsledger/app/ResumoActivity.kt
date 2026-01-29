@@ -33,7 +33,6 @@ class ResumoActivity : AppCompatActivity() {
 
         carregarLista()
 
-        // 🗑️ Excluir ao segurar
         listView.setOnItemLongClickListener { _, _, position, _ ->
             AlertDialog.Builder(this)
                 .setTitle("Excluir lançamento")
@@ -54,12 +53,11 @@ class ResumoActivity : AppCompatActivity() {
         var totalEntradas = 0.0
         var totalSaidas = 0.0
 
+        val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+
         for (i in 0 until transacoes.length()) {
             val item = transacoes.getJSONObject(i)
-            val valor = item.optString("valor", "0")
-                .replace(",", ".")
-                .toDoubleOrNull() ?: 0.0
-
+            val valor = item.optString("valor", "0").replace(".", "").replace(",", ".").toDoubleOrNull() ?: 0.0
             val tipo = item.optString("tipo", "saida")
 
             if (tipo == "entrada") totalEntradas += valor
@@ -67,21 +65,17 @@ class ResumoActivity : AppCompatActivity() {
         }
 
         val saldo = totalEntradas - totalSaidas
-        val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
 
-        tvTotal.text =
-            "Entradas: ${formatador.format(totalEntradas)}\n" +
-            "Saídas: ${formatador.format(totalSaidas)}\n" +
-            "Saldo: ${formatador.format(saldo)}"
+        tvTotal.text = "Entradas: ${formatador.format(totalEntradas)}\n" +
+                "Saídas: ${formatador.format(totalSaidas)}\n" +
+                "Saldo: ${formatador.format(saldo)}"
 
-        // 💡 Dicas financeiras
         val dicas = FinancialAdvisor.gerarDicas(transacoes)
         tvDicas.text = dicas.joinToString("\n\n")
 
-        // 📊 Gráfico
         mostrarGrafico(totalEntradas, totalSaidas)
 
-        // 🧾 LISTA BONITA (extrato)
+        // 🔥 AQUI ESTÁ A MÁGICA
         val adapter = TransactionAdapter(this, transacoes)
         listView.adapter = adapter
     }
