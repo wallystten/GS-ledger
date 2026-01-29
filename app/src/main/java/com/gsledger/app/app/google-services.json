@@ -1,1 +1,29 @@
-
+{
+  "project_info": {
+    "project_number": "313117792922",
+    "project_id": "gs-ledger1",
+    "storage_bucket": "gs-ledger1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:313117792922:android:142d32250e499f76815d23",
+        "android_client_info": {
+          "package_name": "com.gsledger.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByecwG6_2tFttcWuy-my_ySh-Zs_LYJ0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
