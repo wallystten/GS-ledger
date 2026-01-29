@@ -13,6 +13,8 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import org.json.JSONArray
 import java.text.NumberFormat
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ResumoActivity : AppCompatActivity() {
 
@@ -56,13 +58,25 @@ class ResumoActivity : AppCompatActivity() {
         var totalEntradas = 0.0
         var totalSaidas = 0.0
 
+        // 🔥 MAPA PARA SOMAR GASTOS POR CATEGORIA
+        val gastosPorCategoria = HashMap<String, Double>()
+
         for (i in 0 until transacoes.length()) {
             val item = transacoes.getJSONObject(i)
+
             val valor = parseValorSeguro(item.optString("valor", "0"))
             val tipo = item.optString("tipo", "saida")
+            val categoria = item.optString("categoria", "Outros")
 
-            if (tipo == "entrada") totalEntradas += valor
-            else totalSaidas += valor
+            if (tipo == "entrada") {
+                totalEntradas += valor
+            } else {
+                totalSaidas += valor
+
+                // Soma na categoria
+                val atual = gastosPorCategoria[categoria] ?: 0.0
+                gastosPorCategoria[categoria] = atual + valor
+            }
         }
 
         val saldo = totalEntradas - totalSaidas
@@ -76,56 +90,47 @@ class ResumoActivity : AppCompatActivity() {
         val dicas = FinancialAdvisor.gerarDicas(transacoes)
         tvDicas.text = dicas.joinToString("\n\n")
 
-        mostrarGrafico(totalEntradas, totalSaidas)
+        mostrarGraficoCategorias(gastosPorCategoria)
     }
 
-    /**
-     * 🔥 CONVERSÃO INTELIGENTE DE VALORES
-     * Aceita:
-     * 100,50
-     * 100.50
-     * 1.234,56
-     * 1234.56
-     */
     private fun parseValorSeguro(valorStr: String): Double {
         val valor = valorStr.trim()
-
         return try {
             when {
-                valor.contains(",") && valor.contains(".") -> {
-                    // Formato brasileiro 1.234,56
+                valor.contains(",") && valor.contains(".") ->
                     valor.replace(".", "").replace(",", ".").toDouble()
-                }
-                valor.contains(",") -> {
-                    // Formato 100,50
+                valor.contains(",") ->
                     valor.replace(",", ".").toDouble()
-                }
-                else -> {
-                    // Formato 100.50 ou 100
+                else ->
                     valor.toDouble()
-                }
             }
         } catch (e: Exception) {
             0.0
         }
     }
 
-    private fun mostrarGrafico(entradas: Double, saidas: Double) {
+    // 📊 GRÁFICO DE GASTOS POR CATEGORIA
+    private fun mostrarGraficoCategorias(gastos: Map<String, Double>) {
         val entries = ArrayList<PieEntry>()
 
-        if (entradas > 0) entries.add(PieEntry(entradas.toFloat(), "Entradas"))
-        if (saidas > 0) entries.add(PieEntry(saidas.toFloat(), "Saídas"))
+        for ((categoria, valor) in gastos) {
+            if (valor > 0) {
+                entries.add(PieEntry(valor.toFloat(), categoria))
+            }
+        }
 
-        val dataSet = PieDataSet(entries, "Resumo Financeiro")
+        val dataSet = PieDataSet(entries, "Gastos por Categoria")
         dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
-        dataSet.valueTextSize = 14f
+        dataSet.valueTextSize = 13f
+        dataSet.sliceSpace = 3f
 
         val data = PieData(dataSet)
 
         pieChart.data = data
         pieChart.description.isEnabled = false
-        pieChart.centerText = "Fluxo de Caixa"
-        pieChart.animateY(1000)
+        pieChart.centerText = "Onde você gasta"
+        pieChart.setEntryLabelColor(android.graphics.Color.BLACK)
+        pieChart.animateY(1200)
         pieChart.invalidate()
     }
 }
