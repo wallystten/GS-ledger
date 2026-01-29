@@ -11,13 +11,13 @@ object Storage {
     private const val PREF_NAME = "GS_LEDGER_PREFS"
     private const val KEY_TRANSACTIONS = "transactions"
 
-    // 🔹 MÉTODO PADRÃO COM ORIGEM (VERSÃO FINAL)
     fun saveTransaction(
         context: Context,
         descricao: String,
         valor: String,
         tipo: String,
-        origem: String = "Manual"
+        origem: String = "Manual",
+        categoria: String = "Geral"
     ) {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val jsonArray = JSONArray(prefs.getString(KEY_TRANSACTIONS, "[]"))
@@ -31,6 +31,7 @@ object Storage {
             put("data", dataAtual)
             put("tipo", tipo)
             put("origem", origem)
+            put("categoria", categoria) // 🆕 NOVO CAMPO
         }
 
         jsonArray.put(transaction)
