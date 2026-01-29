@@ -1,6 +1,7 @@
 package com.gsledger.app
 
 import android.app.AlertDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.ListView
 import android.widget.TextView
@@ -58,7 +59,6 @@ class ResumoActivity : AppCompatActivity() {
         var totalEntradas = 0.0
         var totalSaidas = 0.0
 
-        // 🔥 MAPA PARA SOMAR GASTOS POR CATEGORIA
         val gastosPorCategoria = HashMap<String, Double>()
 
         for (i in 0 until transacoes.length()) {
@@ -66,14 +66,18 @@ class ResumoActivity : AppCompatActivity() {
 
             val valor = parseValorSeguro(item.optString("valor", "0"))
             val tipo = item.optString("tipo", "saida")
-            val categoria = item.optString("categoria", "Outros")
+            var categoria = item.optString("categoria", "")
+
+            // 🔥 Se não tiver categoria salva, cria automaticamente
+            if (categoria.isBlank()) {
+                categoria = if (tipo == "entrada") "Entradas" else "Outros"
+            }
 
             if (tipo == "entrada") {
                 totalEntradas += valor
             } else {
                 totalSaidas += valor
 
-                // Soma na categoria
                 val atual = gastosPorCategoria[categoria] ?: 0.0
                 gastosPorCategoria[categoria] = atual + valor
             }
@@ -109,7 +113,6 @@ class ResumoActivity : AppCompatActivity() {
         }
     }
 
-    // 📊 GRÁFICO DE GASTOS POR CATEGORIA
     private fun mostrarGraficoCategorias(gastos: Map<String, Double>) {
         val entries = ArrayList<PieEntry>()
 
@@ -117,6 +120,12 @@ class ResumoActivity : AppCompatActivity() {
             if (valor > 0) {
                 entries.add(PieEntry(valor.toFloat(), categoria))
             }
+        }
+
+        if (entries.isEmpty()) {
+            pieChart.clear()
+            pieChart.centerText = "Sem gastos ainda"
+            return
         }
 
         val dataSet = PieDataSet(entries, "Gastos por Categoria")
@@ -129,7 +138,7 @@ class ResumoActivity : AppCompatActivity() {
         pieChart.data = data
         pieChart.description.isEnabled = false
         pieChart.centerText = "Onde você gasta"
-        pieChart.setEntryLabelColor(android.graphics.Color.BLACK)
+        pieChart.setEntryLabelColor(Color.BLACK)
         pieChart.animateY(1200)
         pieChart.invalidate()
     }
