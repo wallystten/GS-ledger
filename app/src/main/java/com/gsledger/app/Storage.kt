@@ -11,7 +11,6 @@ object Storage {
     private const val PREF_NAME = "GS_LEDGER_PREFS"
     private const val KEY_TRANSACTIONS = "transactions"
 
-    // 🔹 MÉTODO ANTIGO (continua funcionando)
     fun saveTransaction(
         context: Context,
         descricao: String,
@@ -21,18 +20,6 @@ object Storage {
         saveTransaction(context, descricao, valor, tipo, "Manual", "Outros")
     }
 
-    // 🔹 MÉTODO COM ORIGEM
-    fun saveTransaction(
-        context: Context,
-        descricao: String,
-        valor: String,
-        tipo: String,
-        origem: String
-    ) {
-        saveTransaction(context, descricao, valor, tipo, origem, "Outros")
-    }
-
-    // 🔹 MÉTODO NOVO COMPLETO (origem + categoria)
     fun saveTransaction(
         context: Context,
         descricao: String,
