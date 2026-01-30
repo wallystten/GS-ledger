@@ -2,37 +2,35 @@ package com.gsledger.app
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.analytics.FirebaseAnalytics
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val btnAdicionar = findViewById<Button>(R.id.btnAdicionar)
-        val btnVerResumo = findViewById<Button>(R.id.btnVerResumo)
-        val btnEscanearQR = findViewById<Button>(R.id.btnEscanearQR)
-        val btnAtivarNotif = findViewById<Button>(R.id.btnAtivarNotif)
+        // 🔥 Inicializa o Firebase Analytics
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
-        btnAdicionar.setOnClickListener {
+        val btnAdd = findViewById<Button>(R.id.btnAdd)
+        val btnResumo = findViewById<Button>(R.id.btnResumo)
+        val btnScanner = findViewById<Button>(R.id.btnScanner)
+
+        btnAdd.setOnClickListener {
             startActivity(Intent(this, AddTransactionActivity::class.java))
         }
 
-        btnVerResumo.setOnClickListener {
+        btnResumo.setOnClickListener {
             startActivity(Intent(this, ResumoActivity::class.java))
         }
 
-        btnEscanearQR.setOnClickListener {
+        btnScanner.setOnClickListener {
             startActivity(Intent(this, QrScannerActivity::class.java))
-        }
-
-        // 🔔 Abre a tela do Android para permitir leitura de notificações
-        btnAtivarNotif.setOnClickListener {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
         }
     }
 }
-  
