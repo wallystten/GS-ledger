@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
 
         val btnAdicionar = findViewById<Button>(R.id.btnAdicionar)
         val btnVerResumo = findViewById<Button>(R.id.btnVerResumo)
-        val btnEscanearQR = findViewByById<Button>(R.id.btnEscanearQR)
+        val btnEscanearQR = findViewById<Button>(R.id.btnEscanearQR)
         val btnAtivarNotif = findViewById<Button>(R.id.btnAtivarNotif)
 
         // ➕ Adicionar lançamento manual
